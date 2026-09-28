@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Master Document Register · EvoRail</title>
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand">EvoRail <span>prototype</span></div>
+  <div class="proj"><strong>Line A</strong>LNA · Detailed design</div>
+  <div class="group">Project</div>
+  <a href="overview.html">Overview</a>
+  <a class="active" href="mdr.html">Documents</a>
+  <a href="drawings.html">Drawings</a>
+  <a href="transmittals.html">Transmittals</a>
+  <a href="review.html">Reviews</a>
+  <a href="my-work.html">My Work</a>
+  <a href="organizations.html">Organizations</a>
+</aside>
+<div class="main">
+  <header class="top"><div class="search">Documents</div><div class="who"><strong>Sara Mehdi</strong>Document controller · sees both contractors</div></header>
+  <div class="workspace">
+    <div class="row" style="justify-content:space-between">
+      <h1>Master Document Register</h1>
+      <div class="row"><a class="btn" href="transmittal-new.html">Create transmittal</a><a class="btn primary" href="new-revision.html">Upload</a></div>
+    </div>
+    <p class="sub">40 controlled documents. Signed in as Sara Mehdi, so organization-confidential rows for Tractis and Pontis are both visible. Ines Rahmani would not see the Tractis method.</p>
+    <div class="chips">
+      <a class="chip on" href="mdr.html">All</a>
+      <a class="chip" href="review.html">My Reviews</a>
+      <a class="chip" href="review.html">Overdue Reviews</a>
+      <a class="chip" href="drawings.html">Track — IFC</a>
+      <a class="chip" href="#missing">Missing Metadata</a>
+      <a class="chip" href="drawings.html">Lot 03</a>
+      <a class="chip" href="#returned">Returned for Revision</a>
+    </div>
+    <div class="layout">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Number</th><th>Title</th><th>Rev</th><th>State</th><th>Disc.</th></tr></thead>
+          <tbody>
+            <tr class="pick"><td><input type="checkbox" checked></td><td class="num"><a href="drawing.html">LNA-EVO-TRK-DWG-S05-00142</a></td><td>Track alignment — Section 05</td><td>D</td><td><span class="tag ok">Current</span> <span class="tag ok">IFC</span></td><td>TRK</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num"><a href="drawings.html">LNA-EVO-TRK-DWG-S05-00143</a></td><td>Track typical cross-section</td><td>C</td><td><span class="tag ok">Current</span> <span class="tag ok">IFC</span></td><td>TRK</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num"><a href="review.html">LNA-EVO-TRK-DWG-S05-00188</a></td><td>Platform drainage interface</td><td>C</td><td><span class="tag bad">Overdue</span> <span class="tag warn">In review</span></td><td>TRK</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-TRK-DWG-S05-00190</td><td>Ballast profile</td><td>B</td><td><span class="tag warn">In review</span></td><td>TRK</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-CIV-DWG-S01-00011</td><td>Corridor layout — Section 01</td><td>B</td><td><span class="tag ok">Current</span> <span class="tag info">Approved</span></td><td>CIV</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-CIV-DWG-S02-00022</td><td>Corridor layout — Section 02</td><td>A</td><td><span class="tag warn">In review</span></td><td>CIV</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-CIV-DWG-S03-00031</td><td>Corridor layout — Section 03</td><td>A</td><td><span class="tag mute">Draft</span></td><td>CIV</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-ERW-DWG-S01-00008</td><td>Earthworks typical sections</td><td>C</td><td><span class="tag ok">Current</span> <span class="tag ok">IFC</span></td><td>ERW</td></tr>
+            <tr id="returned"><td><input type="checkbox"></td><td class="num">LNA-EVO-STR-DWG-S04-00044</td><td>Bridge BR-017 deck reinforcement</td><td>B</td><td><span class="tag warn">Returned</span></td><td>STR</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-PNT-STR-DWG-S04-00021</td><td>Bridge BR-017 general arrangement</td><td>B</td><td><span class="tag warn">In review</span></td><td>STR</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-STR-DWG-S02-00018</td><td>Culvert CV-017 general arrangement</td><td>A</td><td><span class="tag ok">Current</span> <span class="tag ok">IFC</span></td><td>STR</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num"><a href="document.html">LNA-EVO-STR-CAL-S04-00017</a></td><td>Bridge BR-017 calculation note</td><td>B</td><td><span class="tag warn">In review</span> <span class="tag info">Client</span></td><td>STR</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-SIG-DWG-S04-00082</td><td>Signalling schematic — Section 04</td><td>D</td><td><span class="tag ok">Current</span> <span class="tag ok">IFC</span></td><td>SIG</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-SIG-MST-S04-00007</td><td>Signalling installation method</td><td>B</td><td><span class="tag ok">Current</span> <span class="tag info">Approved</span></td><td>SIG</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-TRC-GEN-MST-S01-00014</td><td>Earthworks method — Lot 01</td><td>B</td><td><span class="tag ok">Current</span> <span class="tag mute">Organization</span></td><td>GEN</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-PNT-GEN-MST-S04-00009</td><td>Bridge erection method — Lot 02</td><td>A</td><td><span class="tag mute">Draft</span> <span class="tag mute">Organization</span></td><td>GEN</td></tr>
+            <tr id="missing"><td><input type="checkbox"></td><td class="num">CERT-C30-S01</td><td>Concrete mix certificate C30</td><td>A</td><td><span class="tag warn">Missing discipline</span></td><td>—</td></tr>
+            <tr><td><input type="checkbox"></td><td class="num">LNA-EVO-SUR-REP-S05-00002</td><td>Topographic report — Section 05</td><td>A</td><td><span class="tag warn">Missing section</span></td><td>SUR</td></tr>
+            <tr><td colspan="6" class="note">Plus 22 more seed rows of the same shape: stations, telecom, OCS, power draft, systems, canopy returned, noise barrier, survey drawing, geotech report, lab test, BOQ, schedule, minutes, design report, alignment note, hydraulic calc returned, OCS spec, safety procedure, borehole plan, drainage long section. Full list is in docs/REALISTIC_RAILWAY_SEED_DATA.md.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <aside class="sheet">
+        <h3>LNA-EVO-TRK-DWG-S05-00142</h3>
+        <p>Track alignment — Section 05</p>
+        <div class="kv">
+          <span>Current</span><b>Rev D · IFC</b>
+          <span>Effective</span><b>Current</b>
+          <span>Workflow</span><b>Completed</b>
+          <span>Originator</span><b>Evo Engineering</b>
+        </div>
+        <p><a href="drawing.html">Open drawing</a> · <a href="history.html">History</a></p>
+        <p class="note">The register stays in place. This sheet does not navigate away.</p>
+      </aside>
+    </div>
+  </div>
+</div>
+</div>
+</body>
+</html>
