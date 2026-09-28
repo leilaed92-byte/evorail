@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: evorail
+      POSTGRES_USER: evorail
+      POSTGRES_PASSWORD: evorail
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evorail -d evorail"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  mcp:
+    image: node:24-alpine
+    working_dir: /workspace
+    command: sh -c "npm install && npm run mcp:build && npm run mcp:http"
+    environment:
+      EVORAIL_MCP_BASE_URL: http://host.docker.internal:8000
+      EVORAIL_MCP_TOKEN: ${EVORAIL_MCP_TOKEN:-replace-me}
+      EVORAIL_MCP_PROJECT_ID: ${EVORAIL_MCP_PROJECT_ID:-replace-project-uuid}
+      EVORAIL_MCP_HOST: 0.0.0.0
+      EVORAIL_MCP_PORT: 8787
+    ports:
+      - "8787:8787"
+    volumes:
+      - .:/workspace
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+  minio-data:

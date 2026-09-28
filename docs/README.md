@@ -12,6 +12,8 @@ Working name for Railway Project OS. V1 is engineering information control for m
 | [INFORMATION_ARCHITECTURE.md](INFORMATION_ARCHITECTURE.md) | Global shell and project navigation |
 | [SCREEN_INVENTORY.md](SCREEN_INVENTORY.md) | 32 V1 screens. First 12 are the prototype set |
 | [REALISTIC_RAILWAY_SEED_DATA.md](REALISTIC_RAILWAY_SEED_DATA.md) | Line A seed: organizations, documents, one overdue review, one frozen transmittal, one correspondence chain |
+| [MCP_INTEGRATION.md](MCP_INTEGRATION.md) | Authorized MCP transports, tool boundary, and Laravel endpoint contract |
+| [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) | Current implementation gate, tests, and environment blockers |
 
 Source product plan: `C:\Users\Moham\Downloads\RAILWAY_PROJECT_OS_MASTER_PLAN.md` (v1.0, 2026-09-28).
 

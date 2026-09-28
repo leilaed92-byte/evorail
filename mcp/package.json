@@ -1,0 +1,27 @@
+{
+  "name": "@evorail/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Authorized EvoRail Model Context Protocol server",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start:stdio": "node dist/stdio.js",
+    "start:http": "node dist/http.js",
+    "test": "node --test tests/**/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.1",
+    "express": "5.1.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "24.10.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

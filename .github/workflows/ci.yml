@@ -1,0 +1,38 @@
+name: EvoRail CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  mcp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Build MCP package
+        run: npm run mcp:build
+
+      - name: Test MCP package
+        run: npm run mcp:test
+
+      - name: Validate plugin manifest
+        shell: pwsh
+        run: |
+          $manifest = Get-Content -Raw plugins/evorail/.codex-plugin/plugin.json | ConvertFrom-Json
+          if ($manifest.name -ne 'evorail') { throw 'Invalid plugin name' }
+          if ($manifest.version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid plugin version' }
+          if ($manifest.mcpServers -ne './.mcp.json') { throw 'Invalid MCP manifest path' }
+
+      - name: Run Impeccable prototype detector
+        run: npx impeccable detect --json prototypes

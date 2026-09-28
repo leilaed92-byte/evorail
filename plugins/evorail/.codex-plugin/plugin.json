@@ -1,0 +1,26 @@
+{
+  "name": "evorail",
+  "version": "0.1.0",
+  "description": "EvoRail engineering information control tools and implementation guidance.",
+  "author": {
+    "name": "EvoRail"
+  },
+  "license": "MIT",
+  "keywords": ["railway", "document-control", "engineering", "mcp"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "EvoRail",
+    "shortDescription": "Controlled railway project information",
+    "longDescription": "Authorized EvoRail search, revision context, workflow context, safe drafting, and implementation guidance.",
+    "developerName": "EvoRail",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "Find the authoritative revision for this document.",
+      "Show my overdue EvoRail review work.",
+      "Prepare a draft transmittal from exact revisions."
+    ],
+    "brandColor": "#1D4ED8"
+  }
+}

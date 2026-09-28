@@ -25,3 +25,7 @@ Date: 28 Sep 2026. Set: `prototypes/` against the twelve screens in [SCREEN_INVE
 9. Reports is absent, which matches the prototype cut, and the sidebar does not yet show Project Settings.
 
 None of these contradict the domain rules. They are prototype gaps. Phase E should not treat the abbreviated register as the column or filter specification. The seed file remains the population.
+
+## Design quality baseline
+
+The Impeccable detector was run against `prototypes/` after the shared visual tokens and prototype copy were adjusted. The final detector result is zero findings. The nine gaps above remain product-scope items for the Laravel/Inertia implementation, not design-quality blockers.

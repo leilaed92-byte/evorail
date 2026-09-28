@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "evorail": {
+      "command": "node",
+      "args": ["../../mcp/dist/stdio.js"],
+      "env": {
+        "EVORAIL_MCP_BASE_URL": "${EVORAIL_MCP_BASE_URL}",
+        "EVORAIL_MCP_TOKEN": "${EVORAIL_MCP_TOKEN}",
+        "EVORAIL_MCP_PROJECT_ID": "${EVORAIL_MCP_PROJECT_ID}"
+      }
+    }
+  }
+}
