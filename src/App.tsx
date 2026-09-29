@@ -9,12 +9,6 @@ import {CommandPalette} from '@astryxdesign/core/CommandPalette';
 import {Icon} from '@astryxdesign/core/Icon';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {MoreMenu} from '@astryxdesign/core/MoreMenu';
-import {
-  SideNav,
-  SideNavHeading,
-  SideNavItem,
-  SideNavSection,
-} from '@astryxdesign/core/SideNav';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {TopNav} from '@astryxdesign/core/TopNav';
@@ -31,14 +25,10 @@ import {
   BookOpenIcon,
   BuildingOffice2Icon,
   CalendarDaysIcon,
-  ChartBarIcon,
   CheckCircleIcon,
   ChevronRightIcon,
   CircleStackIcon,
-  ClipboardDocumentListIcon,
   ClockIcon,
-  Cog6ToothIcon,
-  DocumentMagnifyingGlassIcon,
   DocumentTextIcon,
   EllipsisHorizontalIcon,
   ExclamationTriangleIcon,
@@ -55,12 +45,11 @@ import {
   ShareIcon,
   ShieldCheckIcon,
   SunIcon,
-  TableCellsIcon,
-  UserCircleIcon,
   UsersIcon,
   ViewColumnsIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import {AppSidebar} from './components/app-sidebar/app-sidebar';
 
 type StatusKind = 'current' | 'review' | 'returned' | 'draft' | 'ifc' | 'overdue';
 
@@ -199,6 +188,15 @@ const theme = defineTheme({
     '--infrasoft-muted': ['#ecefee', '#2b2d2e'],
     '--infrasoft-accent': ['#e74c3c', '#f27364'],
     '--infrasoft-accent-soft': ['#fff0ed', '#452522'],
+    '--sidebar-width': ['134px', '134px'],
+    '--sidebar-width-icon': ['35px', '35px'],
+    '--sidebar-background': ['#fcfcfb', '#1f2221'],
+    '--sidebar-border': ['#e7e4df', '#3e403e'],
+    '--sidebar-foreground': ['#292826', '#f1efec'],
+    '--sidebar-muted': ['#74716c', '#b6b2ad'],
+    '--sidebar-hover': ['#f3f1ee', '#2a2d2b'],
+    '--sidebar-active': ['#fff2ef', '#452522'],
+    '--sidebar-active-foreground': ['#96352d', '#f5c0b7'],
   },
   tokens: {
     '--color-accent': ['#e74c3c', '#f27364'],
@@ -294,8 +292,6 @@ function Shell({children, darkMode, setDarkMode}: {children: ReactNode; darkMode
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  const selected = (href: string) => (href === '/overview' && (path === '/' || path === '/overview')) || path === href || (href === '/documents' && path.startsWith('/documents'));
-
   return (
     <Theme theme={theme} mode={darkMode ? 'dark' : 'light'}>
       <div className={`v2-root ${darkMode ? 'v2-dark' : ''}`}>
@@ -329,30 +325,7 @@ function Shell({children, darkMode, setDarkMode}: {children: ReactNode; darkMode
               }
             />
           }
-          sideNav={
-            <SideNav
-              collapsible={{buttonLabel: 'Réduire la navigation'}}
-              resizable={{defaultWidth: 248, minWidth: 220, maxWidth: 320, autoSaveId: 'evorail-shell'}}
-              header={<div className="side-brand-lockup"><button className="infrasoft-wordmark" onClick={() => navigate('/overview')}>INFRASOFT</button><strong>EvoRail</strong><small>Ingénierie infrastructure ferroviaire</small></div>}
-              topContent={<div className="project-context"><span className="context-label">ESPACE PROJET</span><button onClick={() => navigate('/overview')}><span className="project-dot">L</span><span><strong>Ligne A · LNA</strong><small>Conception détaillée</small></span><ChevronRightIcon /></button></div>}
-              footer={<SideNavSection title="Compte" isHeaderHidden><SideNavItem label="Sara Mehdi" icon={UserCircleIcon} href="/signin" /></SideNavSection>}
-            >
-              <SideNavSection title="PROJECT">
-                <SideNavItem label="Aperçu" icon={ChartBarIcon} href="/overview" isSelected={selected('/overview')} />
-                <SideNavItem label="Documents" icon={DocumentTextIcon} href="/documents" isSelected={selected('/documents')} />
-                <SideNavItem label="Dessins" icon={TableCellsIcon} href="/drawings" isSelected={selected('/drawings')} />
-                <SideNavItem label="Transmissions" icon={PaperAirplaneIcon} href="/transmittals" isSelected={selected('/transmittals')} />
-              </SideNavSection>
-              <SideNavSection title="WORKFLOW">
-                <SideNavItem label="Avis" icon={DocumentMagnifyingGlassIcon} href="/reviews" isSelected={selected('/reviews')} endContent={<Badge label="13" variant="warning" />} />
-                <SideNavItem label="Mon travail" icon={ClipboardDocumentListIcon} href="/my-work" />
-              </SideNavSection>
-              <SideNavSection title="ADMINISTRATION">
-                <SideNavItem label="Organisations" icon={BuildingOffice2Icon} href="/organizations" />
-                <SideNavItem label="Paramètres" icon={Cog6ToothIcon} href="/settings" isSelected={selected('/settings')} />
-              </SideNavSection>
-            </SideNav>
-          }
+          sideNav={<AppSidebar pathname={path} onNavigate={navigate} />}
         >
           <main className="v2-main">{children}</main>
         </AppShell>
