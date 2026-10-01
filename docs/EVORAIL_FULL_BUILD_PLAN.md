@@ -2,7 +2,7 @@
 
 **Status:** Approved implementation contract  
 **Repository:** `Mohamedbeghanem/evorail`  
-**Local path:** `C:\Users\Moham\projects\evorail`  
+**Local path:** this repository checkout on macOS (the original Windows path is historical)
 **Date baseline:** 28 Sep 2026  
 **Product:** EvoRail  
 **Product relationship:** Independent product. Not EvoProject.  

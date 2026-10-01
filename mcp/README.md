@@ -4,17 +4,17 @@ The EvoRail MCP server is a thin adapter over the Laravel application. It does n
 
 ## Local stdio
 
-```powershell
-$env:EVORAIL_MCP_BASE_URL = "http://127.0.0.1:8000"
-$env:EVORAIL_MCP_TOKEN = "local-development-token"
-$env:EVORAIL_MCP_PROJECT_ID = "project-uuid"
+```sh
+export EVORAIL_MCP_BASE_URL="http://127.0.0.1:8000"
+export EVORAIL_MCP_TOKEN="local-development-token"
+export EVORAIL_MCP_PROJECT_ID="project-uuid"
 npm run mcp:stdio
 ```
 
 ## HTTP
 
-```powershell
-$env:EVORAIL_MCP_TOKEN = "local-development-token"
+```sh
+export EVORAIL_MCP_TOKEN="local-development-token"
 npm run mcp:http
 ```
 

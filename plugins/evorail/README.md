@@ -4,7 +4,7 @@ This repo-local plugin connects Codex to the EvoRail MCP server and provides imp
 
 Build the MCP package first:
 
-```powershell
+```sh
 npm run mcp:build
 ```
 

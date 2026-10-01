@@ -33,6 +33,7 @@ export const projectNavigation: NavigationItem[] = [
 
 export const workflowNavigation: NavigationItem[] = [
   {label: 'Avis', href: '/reviews', icon: DocumentMagnifyingGlassIcon, badge: 13},
+  {label: 'Approbations', href: '/approvals', icon: DocumentMagnifyingGlassIcon},
   {label: 'Mon travail', href: '/my-work', icon: ClipboardDocumentListIcon},
 ];
 
