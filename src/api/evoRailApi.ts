@@ -24,8 +24,12 @@ export type ApiDocument = {
   id: string;
   project_id: string;
   document_number: string;
+  document_type?: 'document' | 'drawing';
   title: string;
   discipline: string;
+  drawing_type?: string | null;
+  zone?: string | null;
+  location?: string | null;
   workflow_status: string;
   suitability_status: string;
   effective_state: string;
@@ -59,7 +63,7 @@ export type ApiRevision = {
   created_at?: string;
 };
 
-export type DocumentFilters = Partial<Record<'search' | 'workflow_status' | 'suitability' | 'effective_state' | 'discipline' | 'revision' | 'sort', string>> & {current_only?: boolean; page?: number; per_page?: number};
+export type DocumentFilters = Partial<Record<'search' | 'workflow_status' | 'suitability' | 'effective_state' | 'discipline' | 'document_type' | 'drawing_type' | 'zone' | 'location' | 'revision' | 'sort', string>> & {current_only?: boolean; page?: number; per_page?: number};
 export type Pagination = {total: number; current_page: number; per_page: number; last_page: number};
 export type RevisionComparison = {document_id: string; from: string; to: string; changes: Record<string, {from: unknown; to: unknown}>};
 export type ApiPerson = {id: string; name: string; email?: string};
@@ -74,7 +78,7 @@ export type ApiApproval = {
   id: string; project_id: string; document_id: string; revision_id: string; status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   approver?: ApiPerson | null; requested_by?: ApiPerson | null; document?: {id: string; document_number: string; title: string; discipline?: string | null};
   revision?: Pick<ApiRevision, 'id' | 'revision_code' | 'title' | 'workflow_status' | 'suitability_status' | 'effective_state'>;
-  requested_at?: string; decided_at?: string | null; decision_reason?: string | null; created_at?: string; updated_at?: string;
+  requested_at?: string; decided_at?: string | null; decision_reason?: string | null; approved_suitability_status?: string | null; created_at?: string; updated_at?: string;
 };
 export type ApiActivity = {id: string; event_type: string; entity_type: string; entity_id: string; metadata?: Record<string, unknown>; created_at?: string};
 export type ApiTransmissionRecipient = {id: string; transmission_id: string; recipient_type: string; recipient_name: string; recipient_email?: string | null; recipient_address?: string | null; acknowledged_at?: string | null};
@@ -85,7 +89,7 @@ export type ReviewFilters = {status?: string; assignee_user_id?: string; overdue
 export type ApprovalFilters = {status?: string; approver_user_id?: string; discipline?: string; document_id?: string; revision_id?: string; sort?: string; page?: number; per_page?: number};
 export function serializeDocumentFilters(filters: DocumentFilters = {}): string {
   const params = new URLSearchParams();
-  for (const key of ['search', 'workflow_status', 'suitability', 'effective_state', 'discipline', 'revision', 'current_only', 'sort', 'page', 'per_page'] as const) {
+  for (const key of ['search', 'workflow_status', 'suitability', 'effective_state', 'discipline', 'document_type', 'drawing_type', 'zone', 'location', 'revision', 'current_only', 'sort', 'page', 'per_page'] as const) {
     const value = filters[key];
     if (value !== undefined && value !== '') params.set(key, typeof value === 'boolean' ? (value ? '1' : '0') : String(value));
   }
@@ -207,6 +211,9 @@ export const evoRailApi = {
   async documents(projectId: string, filters: DocumentFilters | string = {}): Promise<{items: ApiDocument[]; pagination: Pagination}> {
     return jsonRequest(`/api/projects/${encodeURIComponent(projectId)}/documents?${serializeDocumentFilters(typeof filters === 'string' ? {search: filters} : filters)}`);
   },
+  async drawings(projectId: string, filters: DocumentFilters | string = {}): Promise<{items: ApiDocument[]; pagination: Pagination}> {
+    return jsonRequest(`/api/projects/${encodeURIComponent(projectId)}/drawings?${serializeDocumentFilters(typeof filters === 'string' ? {search: filters} : filters)}`);
+  },
   async revision(id: string): Promise<ApiRevision> {
     const result = await jsonRequest<{revision: ApiRevision}>(`/api/revisions/${encodeURIComponent(id)}`);
     return result.revision;
@@ -303,8 +310,8 @@ export const evoRailApi = {
     const result = await jsonRequest<{approval: ApiApproval}>(`/api/documents/${encodeURIComponent(documentId)}/approvals`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({revision_id: input.revisionId, approver_user_id: input.approverUserId})});
     return result.approval;
   },
-  async decideApproval(id: string, action: 'approve' | 'reject', reason?: string): Promise<ApiApproval> {
-    const result = await jsonRequest<{approval: ApiApproval}>(`/api/approvals/${encodeURIComponent(id)}/${action}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({reason})});
+  async decideApproval(id: string, action: 'approve' | 'reject', reason?: string, suitabilityStatus?: string): Promise<ApiApproval> {
+    const result = await jsonRequest<{approval: ApiApproval}>(`/api/approvals/${encodeURIComponent(id)}/${action}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({reason, suitability_status: suitabilityStatus})});
     return result.approval;
   },
   async createRevision(documentId: string, input: {revisionCode: string; title: string; changeReason: string; file: File}, idempotencyKey = crypto.randomUUID()): Promise<ApiRevision> {

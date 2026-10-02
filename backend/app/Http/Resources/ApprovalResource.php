@@ -30,6 +30,7 @@ class ApprovalResource extends JsonResource
             'requested_at' => $this->requested_at?->toISOString(),
             'decided_at' => $this->decided_at?->toISOString(),
             'decision_reason' => $this->decision_reason,
+            'approved_suitability_status' => $this->approved_suitability_status?->value,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ApprovalStatus;
+use App\Enums\SuitabilityStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ class Approval extends Model
     protected $fillable = [
         'project_id', 'document_id', 'revision_id', 'status', 'approver_user_id', 'requested_by',
         'requested_at', 'decided_at', 'decision_reason',
+        'approved_suitability_status',
     ];
 
     protected function casts(): array
@@ -23,6 +25,7 @@ class Approval extends Model
             'status' => ApprovalStatus::class,
             'requested_at' => 'datetime',
             'decided_at' => 'datetime',
+            'approved_suitability_status' => SuitabilityStatus::class,
         ];
     }
 

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ApprovalStatus;
+use App\Enums\EffectiveState;
+use App\Enums\SuitabilityStatus;
+use App\Enums\WorkflowStatus;
 use App\Http\Requests\ApprovalDecisionRequest;
 use App\Http\Requests\ApprovalIndexRequest;
 use App\Http\Requests\StoreApprovalRequest;
@@ -104,8 +107,34 @@ class ApprovalController extends Controller
             if ($locked->status !== ApprovalStatus::Pending) {
                 return ApiResponse::error($request, 'This approval already has a final decision.', 409, ['status' => [$locked->status->value]], 'approval_decision_conflict');
             }
-            $locked->forceFill(['status' => $status, 'decided_at' => now(), 'decision_reason' => $request->input('reason')])->save();
-            $this->audit($locked, $request, 'approval.'.$status->value, ['revision_id' => $locked->revision_id, 'document_id' => $locked->document_id, 'status' => $status->value, 'reason' => $locked->decision_reason]);
+
+            $revision = DocumentRevision::query()->lockForUpdate()->findOrFail($locked->revision_id);
+            $document = Document::query()->lockForUpdate()->findOrFail($locked->document_id);
+            if ($revision->document_id !== $document->id || $document->project_id !== $locked->project_id) {
+                return ApiResponse::error($request, 'The approval, document, and revision must share one project and document.', 409, [], 'approval_context_conflict');
+            }
+
+            $suitability = $status === ApprovalStatus::Approved ? $request->input('suitability_status') : null;
+            $locked->forceFill([
+                'status' => $status,
+                'decided_at' => now(),
+                'decision_reason' => $request->input('reason'),
+                'approved_suitability_status' => $suitability,
+            ])->save();
+            $this->audit($locked, $request, 'approval.'.$status->value, [
+                'revision_id' => $locked->revision_id,
+                'document_id' => $locked->document_id,
+                'status' => $status->value,
+                'reason' => $locked->decision_reason,
+                'suitability_status' => $suitability,
+            ]);
+
+            if ($status === ApprovalStatus::Approved) {
+                $revision->forceFill(['workflow_status' => WorkflowStatus::Completed])->save();
+                if ($suitability !== null) {
+                    $this->applySuitabilityDecision($request, $locked, $document, $revision, SuitabilityStatus::from($suitability));
+                }
+            }
 
             return $locked;
         });
@@ -121,9 +150,54 @@ class ApprovalController extends Controller
         return $approval->load(['document', 'revision', 'approver', 'requester']);
     }
 
+    private function applySuitabilityDecision(Request $request, Approval $approval, Document $document, DocumentRevision $revision, SuitabilityStatus $suitability): void
+    {
+        if (! in_array($suitability, [SuitabilityStatus::IssuedForConstruction, SuitabilityStatus::AsBuilt], true)) {
+            $revision->forceFill(['suitability_status' => $suitability])->save();
+
+            return;
+        }
+
+        $previousRevisionId = $document->current_revision_id;
+        if ($previousRevisionId !== null && $previousRevisionId !== $revision->id) {
+            $previousRevision = DocumentRevision::query()->lockForUpdate()->find($previousRevisionId);
+            if ($previousRevision !== null) {
+                $previousRevision->forceFill(['effective_state' => EffectiveState::Superseded])->save();
+                $this->auditRevision($request, $document->project_id, $previousRevision->id, 'revision.superseded', [
+                    'document_id' => $document->id,
+                    'previous_revision_id' => $previousRevision->id,
+                    'replacement_revision_id' => $revision->id,
+                ]);
+            }
+        }
+
+        $revision->forceFill([
+            'workflow_status' => WorkflowStatus::Completed,
+            'suitability_status' => $suitability,
+            'effective_state' => EffectiveState::Current,
+        ])->save();
+        $document->forceFill([
+            'current_revision_id' => $revision->id,
+            'title' => $revision->title,
+            'workflow_status' => WorkflowStatus::Completed,
+            'suitability_status' => $suitability,
+            'effective_state' => EffectiveState::Current,
+        ])->save();
+        $this->auditRevision($request, $document->project_id, $revision->id, 'revision.current', [
+            'document_id' => $document->id,
+            'revision_id' => $revision->id,
+            'suitability_status' => $suitability->value,
+        ]);
+    }
+
     private function audit(Approval $approval, Request $request, string $event, array $metadata): void
     {
         AuditEvent::query()->create(['project_id' => $approval->project_id, 'actor_user_id' => $request->user()->id, 'event_type' => $event, 'entity_type' => 'approval', 'entity_id' => $approval->id, 'metadata' => $metadata]);
+    }
+
+    private function auditRevision(Request $request, string $projectId, string $revisionId, string $event, array $metadata): void
+    {
+        AuditEvent::query()->create(['project_id' => $projectId, 'actor_user_id' => $request->user()->id, 'event_type' => $event, 'entity_type' => 'revision', 'entity_id' => $revisionId, 'metadata' => $metadata]);
     }
 
     private function sort(string $sort): array

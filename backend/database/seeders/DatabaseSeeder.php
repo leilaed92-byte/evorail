@@ -40,25 +40,33 @@ class DatabaseSeeder extends Seeder
             ProjectMembership::query()->firstOrCreate(['project_id' => $projectA->id, 'user_id' => $admin->id], ['role' => 'admin', 'status' => 'active']);
             ProjectMembership::query()->firstOrCreate(['project_id' => $projectB->id, 'user_id' => $admin->id], ['role' => 'admin', 'status' => 'active']);
 
-            $this->createDocument($projectA, $userA, 'LNA-EVO-TRK-DWG-S05-00142', 'Track alignment — Section 05');
+            $this->createDocument($projectA, $userA, 'LNA-EVO-TRK-DWG-S05-00142', 'Track alignment — Section 05', ['drawing_type' => 'Alignment plan', 'zone' => 'S05', 'location' => 'Section 05']);
             $this->createDocument($projectA, $userA, 'LNA-EVO-STR-CAL-S04-00017', 'BR-017 calculation note');
             $this->createDocument($projectB, $userB, 'LNB-PNT-GEN-MST-S01-00009', 'Pontis method statement');
         });
     }
 
-    private function createDocument(Project $project, User $creator, string $number, string $title): Document
+    /** @param array{drawing_type?: string, zone?: string, location?: string} $drawingMetadata */
+    private function createDocument(Project $project, User $creator, string $number, string $title, array $drawingMetadata = []): Document
     {
         $document = Document::query()->firstOrCreate([
             'project_id' => $project->id,
             'document_number' => $number,
         ], [
             'title' => $title,
+            'document_type' => $drawingMetadata === [] ? 'document' : 'drawing',
             'discipline' => str_contains($number, '-STR-') ? 'STR' : 'TRK',
+            'drawing_type' => $drawingMetadata['drawing_type'] ?? null,
+            'zone' => $drawingMetadata['zone'] ?? null,
+            'location' => $drawingMetadata['location'] ?? null,
             'workflow_status' => WorkflowStatus::Completed,
             'suitability_status' => SuitabilityStatus::IssuedForConstruction,
             'effective_state' => EffectiveState::Current,
             'created_by' => $creator->id,
         ]);
+        if ($drawingMetadata !== []) {
+            $document->forceFill(['document_type' => 'drawing', ...$drawingMetadata])->save();
+        }
 
         foreach (['A', 'B'] as $index => $code) {
             if ($document->revisions()->where('revision_code', $code)->exists()) {

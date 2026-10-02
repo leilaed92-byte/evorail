@@ -16,10 +16,25 @@ class DocumentController extends Controller
 {
     public function index(DocumentIndexRequest $request, Project $project): JsonResponse
     {
+        return $this->register($request, $project, false);
+    }
+
+    public function drawings(DocumentIndexRequest $request, Project $project): JsonResponse
+    {
+        return $this->register($request, $project, true);
+    }
+
+    private function register(DocumentIndexRequest $request, Project $project, bool $drawingsOnly): JsonResponse
+    {
         Gate::authorize('viewAny', [Document::class, $project]);
 
         $query = $project->documents()->with(['currentRevision.storedFile'])->select('documents.*');
         $validated = $request->validated();
+        if ($drawingsOnly) {
+            $query->where('document_type', 'drawing');
+        } elseif (isset($validated['document_type'])) {
+            $query->where('document_type', $validated['document_type']);
+        }
 
         if ($request->filled('search')) {
             $term = '%'.$request->string('search')->toString().'%';
@@ -38,6 +53,12 @@ class DocumentController extends Controller
         ] as $input => $column) {
             if (array_key_exists($input, $validated) && $validated[$input] !== null) {
                 $query->where($column, $validated[$input]);
+            }
+        }
+
+        foreach (['drawing_type', 'zone', 'location'] as $field) {
+            if (array_key_exists($field, $validated) && $validated[$field] !== null) {
+                $query->where($field, $validated[$field]);
             }
         }
 

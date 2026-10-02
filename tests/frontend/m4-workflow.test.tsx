@@ -56,8 +56,9 @@ it('approval requires confirmation and hides final decision controls after succe
   vi.mocked(evoRailApi.approval).mockResolvedValueOnce({approval, activity: []}).mockResolvedValueOnce({approval: {...approval, status: 'approved', decided_at: '2026-10-01T10:00:00Z'}, activity: []});
   render(<ApprovalDetail id={approval.id} />);
   await screen.findByText('Décision');
+  fireEvent.change(screen.getByLabelText('Adéquation à appliquer (facultatif)'), {target: {value: 'issued_for_construction'}});
   fireEvent.click(screen.getByRole('button', {name: 'Approuver'}));
-  await waitFor(() => expect(evoRailApi.decideApproval).toHaveBeenCalledWith(approval.id, 'approve', undefined));
+  await waitFor(() => expect(evoRailApi.decideApproval).toHaveBeenCalledWith(approval.id, 'approve', undefined, 'issued_for_construction'));
   expect(window.confirm).toHaveBeenCalled();
   expect(screen.queryByRole('button', {name: 'Approuver'})).toBeNull();
 });

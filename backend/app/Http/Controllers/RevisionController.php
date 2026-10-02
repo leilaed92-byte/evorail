@@ -172,27 +172,37 @@ class RevisionController extends Controller
         $revision->load(['document', 'storedFile']);
         Gate::authorize('preview', $revision);
 
-        if (! in_array($revision->storedFile->mime_type, ['application/pdf', 'image/jpeg', 'image/png', 'image/tiff'], true)) {
+        if (! in_array($revision->storedFile->mime_type, ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/tiff'], true)) {
             return ApiResponse::error($request, 'A protected preview is not available for this file type yet.', 422, [
                 'state' => 'unsupported',
                 'mime_type' => $revision->storedFile->mime_type,
             ], 'preview_unavailable');
         }
 
-        return response()->file(Storage::disk($revision->storedFile->disk)->path($revision->storedFile->path), [
+        $disk = Storage::disk($revision->storedFile->disk);
+        if (! $disk->exists($revision->storedFile->path)) {
+            return ApiResponse::error($request, 'The protected revision file is missing.', 404, [], 'file_missing');
+        }
+
+        return response()->file($disk->path($revision->storedFile->path), [
             'Content-Type' => $revision->storedFile->mime_type,
             'Content-Disposition' => 'inline; filename="'.addslashes($revision->storedFile->original_filename).'"',
             'X-Request-Id' => (string) $request->attributes->get('request_id'),
         ]);
     }
 
-    public function download(Request $request, DocumentRevision $revision): BinaryFileResponse
+    public function download(Request $request, DocumentRevision $revision): BinaryFileResponse|JsonResponse
     {
         $revision->load(['document', 'storedFile']);
         Gate::authorize('download', $revision);
 
+        $disk = Storage::disk($revision->storedFile->disk);
+        if (! $disk->exists($revision->storedFile->path)) {
+            return ApiResponse::error($request, 'The protected revision file is missing.', 404, [], 'file_missing');
+        }
+
         return response()->download(
-            Storage::disk($revision->storedFile->disk)->path($revision->storedFile->path),
+            $disk->path($revision->storedFile->path),
             $revision->storedFile->original_filename,
             [
                 'Content-Type' => $revision->storedFile->mime_type,

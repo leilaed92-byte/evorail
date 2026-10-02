@@ -98,6 +98,68 @@ class ReviewApprovalTest extends TestCase
         $this->assertDatabaseHas('audit_events', ['event_type' => 'approval.approved', 'entity_id' => $approval->id]);
     }
 
+    public function test_approved_issuing_suitability_supersedes_previous_current_revision_atomically(): void
+    {
+        [$reviewer, $approver, $project, $document, $revision] = $this->topology();
+        $revision->forceFill(['effective_state' => 'current', 'suitability_status' => 'approved'])->save();
+        $document->forceFill([
+            'current_revision_id' => $revision->id,
+            'workflow_status' => 'completed',
+            'suitability_status' => 'approved',
+            'effective_state' => 'current',
+        ])->save();
+        $replacement = DocumentRevision::factory()->create([
+            'document_id' => $document->id,
+            'created_by' => $reviewer->id,
+            'revision_code' => 'B',
+            'revision_order' => 2,
+            'workflow_status' => 'under_review',
+            'suitability_status' => 'for_approval',
+            'effective_state' => 'superseded',
+        ]);
+
+        $approval = $this->actingAs($approver)->postJson('/api/documents/'.$document->id.'/approvals', [
+            'revision_id' => $replacement->id,
+            'approver_user_id' => $approver->id,
+        ])->assertCreated()->json('data.approval.id');
+
+        $this->postJson('/api/approvals/'.$approval.'/approve', [
+            'reason' => 'Approved for construction',
+            'suitability_status' => 'issued_for_construction',
+        ])->assertOk()
+            ->assertJsonPath('data.approval.approved_suitability_status', 'issued_for_construction');
+
+        $this->assertDatabaseHas('documents', [
+            'id' => $document->id,
+            'current_revision_id' => $replacement->id,
+            'suitability_status' => 'issued_for_construction',
+            'effective_state' => 'current',
+        ]);
+        $this->assertDatabaseHas('document_revisions', ['id' => $revision->id, 'effective_state' => 'superseded']);
+        $this->assertDatabaseHas('document_revisions', [
+            'id' => $replacement->id,
+            'workflow_status' => 'completed',
+            'suitability_status' => 'issued_for_construction',
+            'effective_state' => 'current',
+        ]);
+        $this->assertDatabaseHas('audit_events', ['event_type' => 'revision.superseded', 'entity_id' => $revision->id]);
+        $this->assertDatabaseHas('audit_events', ['event_type' => 'revision.current', 'entity_id' => $replacement->id]);
+    }
+
+    public function test_approval_rejects_an_unknown_suitability_status(): void
+    {
+        [$reviewer, $approver, $project, $document, $revision] = $this->topology();
+        $approval = $this->actingAs($approver)->postJson('/api/documents/'.$document->id.'/approvals', [
+            'revision_id' => $revision->id,
+            'approver_user_id' => $approver->id,
+        ])->assertCreated()->json('data.approval.id');
+
+        $this->postJson('/api/approvals/'.$approval.'/approve', ['suitability_status' => 'secret_state'])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.suitability_status.0', 'The selected suitability status is invalid.');
+        $this->assertDatabaseHas('approvals', ['id' => $approval, 'status' => 'pending']);
+    }
+
     public function test_unassigned_user_cannot_transition_review_and_non_approver_cannot_decide(): void
     {
         [$reviewer, $approver, $project, $document, $revision] = $this->topology();

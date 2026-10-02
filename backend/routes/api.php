@@ -14,6 +14,7 @@ Route::middleware('throttle:api')->group(function (): void {
     Route::get('/projects', [ProjectController::class, 'index'])->middleware('auth:sanctum');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->middleware('auth:sanctum');
     Route::get('/projects/{project}/documents', [DocumentController::class, 'index'])->middleware('auth:sanctum');
+    Route::get('/projects/{project}/drawings', [DocumentController::class, 'drawings'])->middleware('auth:sanctum');
     Route::get('/documents/{document}', [DocumentController::class, 'show'])->middleware('auth:sanctum');
     Route::get('/documents/{document}/activity', [DocumentController::class, 'activity'])->middleware('auth:sanctum');
     Route::get('/documents/{document}/revisions', [RevisionController::class, 'index'])->middleware('auth:sanctum');

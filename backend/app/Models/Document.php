@@ -16,7 +16,7 @@ class Document extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'project_id', 'document_number', 'title', 'discipline', 'current_revision_id',
+        'project_id', 'document_number', 'document_type', 'title', 'discipline', 'drawing_type', 'zone', 'location', 'current_revision_id',
         'workflow_status', 'suitability_status', 'effective_state', 'created_by',
     ];
 
